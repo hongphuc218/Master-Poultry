@@ -17,6 +17,10 @@ module.exports = {
       },
     },
     extend: {
+      spacing: {
+        '8': '2rem',
+        '16': '4rem',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -72,6 +76,12 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['checked'],
+      translate: ['active', 'checked'],
+    }
   },
   plugins: [require("tailwindcss-animate")],
 }
