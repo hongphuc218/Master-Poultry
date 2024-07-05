@@ -1,6 +1,6 @@
 // DemoPage.tsx
 import React, { useEffect, useState } from 'react';
-import { Product } from "@/types/Product";
+import { Product } from "@/types/Types";
 import { columns } from "./columns";
 import { DataTable } from "./data-table"; // Ensure you have this import path correct
 import { getData } from "./product-data";

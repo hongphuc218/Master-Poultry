@@ -48,7 +48,7 @@ export const fields: InputFields = {
   },
   code: {
     name: 'code',
-    type: 'number',
+    type: 'string',
     placeholder: 'Enter your Code',
     label: 'Code'
   },
@@ -76,8 +76,8 @@ export const fields: InputFields = {
     placeholder: 'Enter your GTIN',
     label: 'GTIN'
   },
-  catergory_id: {
-    name: 'catergory_id',
+  category_id: {
+    name: 'category_id',
     type: 'text',
     placeholder: 'Enter your Catergory ID',
     label: 'Catergory ID'
@@ -129,7 +129,7 @@ export const fields: InputFields = {
     label: 'RSPCA'
   },
   export: {
-    name: 'checkbox',
+    name: 'export',
     type: 'checkbox',
     placeholder: '',
     label: 'Export'

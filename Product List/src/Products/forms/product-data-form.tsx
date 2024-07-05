@@ -24,8 +24,6 @@ const ProductData: React.FC<FormProps> = ({ productId, setIsOpen }) => {
     fetchData();
   }, [productId]);
 
-  console.log(product)
-
 
   return (
     <div className=''>

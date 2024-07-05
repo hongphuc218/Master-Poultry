@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fields, Product } from '@/types/Types';
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,37 +14,39 @@ interface DynamicFormProps {
 
 export const DynamicForm: React.FC<DynamicFormProps> = ({ productId }) => {
   const [product, setProduct] = useState<Product | null>(null);
-  const [formState, setFormState] = useState({});
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       const data = await getData();
-      const foundProduct = data.find(p => p.id === productId);
-      if (foundProduct) {
-        setFormState(foundProduct); // Initialize form values with the found product
-        setProduct(foundProduct);
-      }
-    }
+      const product = await data.find(p => p.id === productId);
+      setProduct(product || null);
+    };
 
-    if (productId !== null) {
-      fetchData();
-    } else {
-      setFormState({}); // Reset form values for new product entry
-    }
+    fetchData();
   }, [productId]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = event.target;
-    const newValue = type === 'checkbox' ? (event.target as HTMLInputElement).checked : value;
-    setFormState(prevState => ({
-      ...prevState,
-      [name]: newValue
+    console.log(`${event.target.name}: ${event.target.value}`);
+  };
+
+  const handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setProduct(prevValues => ({
+      ...prevValues,
+      [name]: checked
     }));
   };
 
+  const handleSelect = (value: string) => {
+    setProduct(prevValues => ({
+      ...prevValues,
+      uom: value
+    }));
+  };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('Form State:', formState);
+    console.log("Form submitted");
+
   };
 
   return (
@@ -55,15 +57,16 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ productId }) => {
           {type === 'select' ? (
             <>
             <Label htmlFor={name}>{label}</Label>
-            <Select name={name}>
-              <SelectTrigger >{placeholder}</SelectTrigger>
+            <Select name={name} defaultValue={product ? product[name] : ''} onValueChange={handleSelect}>
+              <SelectTrigger >
+                <SelectValue placeholder={placeholder} />
+              </SelectTrigger>
               <SelectContent >
-              <SelectGroup >
-                  <SelectLabel>{label}</SelectLabel>
-                  {options?.map(option => (
-                  <SelectItem className='hover:bg-muted' key={option.value} value={option.value}>{option.label}</SelectItem>
-                  ))}
-              </SelectGroup>
+                <SelectGroup >
+                    {options?.map(option => (
+                    <SelectItem className='hover:bg-muted' key={option.value} value={option.value}>{option.label}</SelectItem>
+                    ))}
+                </SelectGroup>
               </SelectContent>
 
             </Select>
@@ -71,25 +74,19 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ productId }) => {
 
           ) : type === 'checkbox' ? (
             <div className="flex items-center">
-                <input type="checkbox" id={name}  onChange={handleChange} className="hidden peer" />
+                <input
+                  type="checkbox"
+                  id={name}
+                  name={name}
+                  checked={product ? product[name] : false} 
+                  onChange={handleCheckbox}
+                  className="hidden peer"
+                />
                 <label htmlFor={name} className="select-none cursor-pointer flex items-center justify-center rounded-lg border-2 border-gray-200
                   py-2 px-4 font-bold  transition-colors duration-200 ease-in-out peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-gray-200 hover:bg-slate-700">
                     <span>{label}</span>
               </label>
           </div>
-          ) : type === 'number' ? (
-            <div>
-              <Label htmlFor={name}>{label}</Label>
-              <Input
-              type="number"
-              name={name}
-              id={name}
-              placeholder={placeholder}
-              value={formState[name] || ''}
-              onChange={handleChange}
-              className="input-number-style" // Apply specific styles for number input
-            />
-            </div>
           ) : (
             <div>
             <Label htmlFor={name}>{label}</Label>
@@ -97,8 +94,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ productId }) => {
             type={type}
             name={name}
             id={name}
+            defaultValue={product ? product[name as keyof Product] as string : ''}
             placeholder={placeholder}
-            value={formState[name] || ''}
             onChange={handleChange}
             />
           </div>
@@ -106,12 +103,11 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ productId }) => {
         </div>
       ))}
       <div className='w-full flex justify-end pr-4'>
-      <Button className='' type="submit">Save</Button>
+      <Button onClick={handleSubmit} className='' type="submit">Save</Button>
       </div>
       </form>
 
     </Form>
   );
 };
-
 
